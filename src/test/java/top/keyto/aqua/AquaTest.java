@@ -16,7 +16,7 @@ public class AquaTest {
     private static final int PORT = 3001;
 
     @Test
-    public void testListen() {
+    public void listen() {
         new Thread(() -> {
             Aqua aqua = new Aqua();
             aqua.listen(PORT);
