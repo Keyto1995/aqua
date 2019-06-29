@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
 
 
 /**
@@ -21,14 +20,10 @@ public class Aqua {
     }
 
     public void listen(int port) {
-        ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(port);
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             log.info("服务器开始监听端口: {}", port);
             while (true) {
-                Socket connection = null;
-                try {
-                    connection = serverSocket.accept();
+                try (Socket connection = serverSocket.accept()) {
                     log.debug("客户端: {} 已连接到服务器", connection.getInetAddress().getHostAddress());
 
                     BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -40,27 +35,10 @@ public class Aqua {
                     bw.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
-                    if (connection != null) {
-                        try {
-                            connection.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
                 }
-
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (serverSocket != null) {
-                try {
-                    serverSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }
