@@ -30,13 +30,13 @@ public class AquaTest {
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
             // 向服务器端发送一条消息
-            bw.write("这是由客户端发送的一条消息\n");
+            bw.write("这是由客户端发送的一条消息\r\n");
             bw.flush();
 
             // 读取服务器返回的消息
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String mess = br.readLine();
-            System.out.println("服务器：" + mess);
+            log.debug("服务器：{}", mess);
         } catch (IOException e) {
             e.printStackTrace();
         }
