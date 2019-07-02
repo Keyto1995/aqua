@@ -1,6 +1,8 @@
 package top.keyto.aqua;
 
 import lombok.extern.slf4j.Slf4j;
+import top.keyto.aqua.core.Context;
+import top.keyto.aqua.middleware.MiddlewareChain;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,18 +20,25 @@ public class HttpHandler implements Runnable {
     private static final int BUFFER_SIZE = 4096;
 
     private Socket socket;
+    private MiddlewareChain middlewareChain;
 
-    public HttpHandler(Socket socket) {
+    public HttpHandler(Socket socket, MiddlewareChain middlewareChain) {
         this.socket = socket;
+        this.middlewareChain = middlewareChain;
     }
 
     @Override
     public void run() {
+        Context context = new Context();
+        middlewareChain.poi(context);
         try {
             byte[] buffer = new byte[BUFFER_SIZE];
             int read = socket.getInputStream().read(buffer);
             log.info("length: {} buffer: \n{}", read, new String(buffer));
-            String mess = "<h1>hello</h1>";
+            String mess = "HTTP/1.0 200 \r\n" +
+                "Name: Keyto\r\n" +
+                "\r\n" +
+                "<h1>hello</h1>\r\n";
             log.debug("客户端：{}", mess);
             Writer bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             bw.write(mess + "\r\n");
