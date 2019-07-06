@@ -39,6 +39,11 @@ public class Aqua {
                 chain.next(ctx);
                 log.info("第二个中间件后");
             }
+        }).use(new Middleware() {
+            @Override
+            public void callback(Context ctx, MiddlewareChain chain) {
+                ctx.getResponse().setBody("Hello World");
+            }
         });
         aqua.listen(8080);
     }
