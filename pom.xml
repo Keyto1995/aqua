@@ -9,6 +9,7 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
+        <file.encoding>utf-8</file.encoding>
         <java.version>1.8</java.version>
     </properties>
 
@@ -41,7 +42,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>RELEASE</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>

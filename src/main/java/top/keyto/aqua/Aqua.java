@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import top.keyto.aqua.core.Context;
 import top.keyto.aqua.middleware.Middleware;
 import top.keyto.aqua.middleware.MiddlewareChain;
+import top.keyto.aqua.middleware.MiddlewareChainFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -42,7 +43,10 @@ public class Aqua {
         }).use(new Middleware() {
             @Override
             public void callback(Context ctx, MiddlewareChain chain) {
+                log.info("第三个中间件前");
                 ctx.getResponse().setBody("Hello World");
+                chain.next(ctx);
+                log.info("第三个中间件后");
             }
         });
         aqua.listen(8080);
@@ -52,7 +56,8 @@ public class Aqua {
      * @param port 监听端口号
      */
     public void listen(int port) {
-        MiddlewareChain middlewareChain = new MiddlewareChain(this.middlewares);
+        MiddlewareChainFactory middlewareChainFactory = new MiddlewareChainFactory(this.middlewares);
+        middlewareChainFactory.initChain();
 
         try (ServerSocket server = new ServerSocket(port)) {
             log.info("服务器开始监听端口: {}", port);
@@ -63,17 +68,18 @@ public class Aqua {
                     Socket connection = server.accept();
                     log.debug("客户端: {} 已连接到服务器", connection.getInetAddress().getHostAddress());
                     // 处理 HTTP 协议
-                    executor.submit(new HttpHandler(connection, middlewareChain));
+                    executor.submit(new HttpHandler(connection, middlewareChainFactory.getMiddlewareChain()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         } catch (IOException e) {
             log.error("服务器启动失败", e);
+        } finally {
+            middlewareChainFactory.destroyChain();
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
     public Aqua use(@NonNull Middleware middleware) {
         this.middlewares.add(middleware);
         return this;
