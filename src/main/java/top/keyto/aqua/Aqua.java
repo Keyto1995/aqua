@@ -59,6 +59,8 @@ public class Aqua {
         MiddlewareChainFactory middlewareChainFactory = new MiddlewareChainFactory(this.middlewares);
         middlewareChainFactory.initChain();
 
+        this.middlewares = null;
+
         try (ServerSocket server = new ServerSocket(port)) {
             log.info("服务器开始监听端口: {}", port);
             ExecutorService executor = Executors.newFixedThreadPool(3);
