@@ -59,8 +59,7 @@ public class AquaTest {
 
             // 读取服务器返回的消息
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String mess = br.readLine();
-            log.debug("服务器：{}", mess);
+            br.lines().forEach(mess -> log.debug("服务器：{}", mess));
         } catch (IOException e) {
             e.printStackTrace();
         }
