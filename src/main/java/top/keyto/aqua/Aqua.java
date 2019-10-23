@@ -64,7 +64,7 @@ public class Aqua {
         this.middlewares = null;
 
         try (ServerSocket server = new ServerSocket(port)) {
-            log.info("服务器开始监听端口: {}", port);
+            log.info("服务器开始监听端口: {}", server.getLocalPort());
             ExecutorService executor = new TraceThreadPoolExecutor(0, Integer.MAX_VALUE, 0L, TimeUnit.SECONDS, new SynchronousQueue<>());
             //noinspection InfiniteLoopStatement
             while (true) {
