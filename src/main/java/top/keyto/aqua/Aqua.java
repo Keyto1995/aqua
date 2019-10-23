@@ -3,6 +3,7 @@ package top.keyto.aqua;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import top.keyto.aqua.core.Context;
+import top.keyto.aqua.executor.TraceThreadPoolExecutor;
 import top.keyto.aqua.middleware.Middleware;
 import top.keyto.aqua.middleware.MiddlewareChain;
 import top.keyto.aqua.middleware.MiddlewareChainFactory;
@@ -13,7 +14,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -63,14 +65,14 @@ public class Aqua {
 
         try (ServerSocket server = new ServerSocket(port)) {
             log.info("服务器开始监听端口: {}", port);
-            ExecutorService executor = Executors.newFixedThreadPool(3);
+            ExecutorService executor = new TraceThreadPoolExecutor(0, Integer.MAX_VALUE, 0L, TimeUnit.SECONDS, new SynchronousQueue<>());
             //noinspection InfiniteLoopStatement
             while (true) {
                 try {
                     Socket connection = server.accept();
                     log.debug("客户端: {} 已连接到服务器", connection.getInetAddress().getHostAddress());
                     // 处理 HTTP 协议
-                    executor.submit(new HttpHandler(connection, middlewareChainFactory.getMiddlewareChain()));
+                    executor.execute(new HttpHandler(connection, middlewareChainFactory.getMiddlewareChain()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
